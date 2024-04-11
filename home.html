@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PC Part Builder</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            text-align: center; /* Center align everything */
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            text-align: left;
+        }
+        .username {
+            text-align: center; /* Center align username */
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        h1 {
+            margin-top: 0;
+            font-size: 28px;
+            color: #333;
+            text-align: center; /* Center align h1 */
+        }
+        form {
+            margin-top: 20px;
+            text-align: center; /* Center align form */
+        }
+        .component-group {
+            margin-top: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            padding: 20px;
+            text-align: left;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        input[type="submit"] {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            margin-top: 20px;
+            background-color: #4caf50;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+        .back-button {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            text-decoration: none;
+            color: #007bff;
+            font-size: 16px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>MICRO CENTER PC PART PICKER</h1>
+        <!-- Username -->
+        <div class="username">
+            Username: <strong>{{ current_user.username if current_user.is_authenticated else "Guest" }}</strong>
+        </div>
+        <!-- Logout button -->
+        <form action="{{ url_for('logout') }}" method="get">
+            <button type="submit">Logout</button>
+        </form>
+
+        <!-- PC Part Selection Form -->
+        <form action="/build-pc" method="post">
+            <!-- CPU Components -->
+            <div class="component-group">
+                <h2>CPU Components:</h2>
+                <label for="cpu">Selection:</label>
+                <select id="cpu" name="cpu">
+                    <option value="" selected disabled>Select CPU</option>
+                    {% for cpu in cpus %}
+                        <option value="{{ cpu.id }}">{{ cpu.brand }} - {{ cpu.model }} - {{ cpu.price }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- CPU Cooler Components -->
+            <div class="component-group">
+                <h2>CPU Cooler Components:</h2>
+                <label for="cpu_cooler">Selection:</label>
+                <select id="cpu_cooler" name="cpu_cooler">
+                    <option value="" selected disabled>Select CPU Cooler</option>
+                    {% for cpu_cooler in cpu_coolers %}
+                        <option value="{{ cpu_cooler.id }}">{{ cpu_cooler.brand }} - {{ cpu_cooler.model }} - {{ cpu_cooler.price }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- GPU Components -->
+            <div class="component-group">
+                <h2>GPU Components:</h2>
+                <label for="gpu">Selection:</label>
+                <select id="gpu" name="gpu">
+                    <option value="" selected disabled>Select GPU</option>
+                    {% for gpu in gpus %}
+                        <option value="{{ gpu.id }}">{{ gpu.brand }} - {{ gpu.model }} - {{ gpu.price }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Motherboard Components -->
+            <div class="component-group">
+                <h2>Motherboard Components:</h2>
+                <label for="motherboard">Selection:</label>
+                <select id="motherboard" name="motherboard">
+                    <option value="" selected disabled>Select Motherboard</option>
+                    {% for mobo in motherboards %}
+                        <option value="{{ mobo.id }}">{{ mobo.brand }} - {{ mobo.model }} - {{ mobo.price }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- RAM Components -->
+            <div class="component-group">
+                <h2>RAM Components:</h2>
+                <label for="ram">Selection:</label>
+                <select id="ram" name="ram">
+                    <option value="" selected disabled>Select RAM</option>
+                    {% for ram in rams %}
+                        <option value="{{ ram.id }}">{{ ram.brand }} - {{ ram.model }} - {{ ram.price }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Storage Components -->
+            <div class="component-group">
+                <h2>Storage Components:</h2>
+                <label for="storage">Selection:</label>
+                <select id="storage" name="storage">
+                    <option value="" selected disabled>Select Storage</option>
+                    {% for storage in storages %}
+                        <option value="{{ storage.id }}">{{ storage.brand }} - {{ storage.model }} - {{ storage.price }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Power Supply Components -->
+            <div class="component-group">
+                <h2>Power Supply Components:</h2>
+                <label for="power_supply">Selection:</label>
+                <select id="power_supply" name="power_supply">
+                    <option value="" selected disabled>Select Power Supply</option>
+                    {% for power_supply in power_supplies %}
+                        <option value="{{ power_supply.id }}">{{ power_supply.brand }} - {{ power_supply.model }} - {{ power_supply.price }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="component-group">
+                <h2>PC Case Components:</h2>
+                <label for="pc_case">Selection:</label>
+                <select id="pc_case" name="pc_case">
+                    <option value="" selected disabled>Select PC Case</option>
+                    {% for pc_case in pc_cases %}
+                        <option value="{{ pc_case.id }}">{{ pc_case.brand }} - {{ pc_case.model }} - {{ pc_case.price }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <input type="submit" value="Build PC">
+        </form>
+    </div>
+</body>
+</html>

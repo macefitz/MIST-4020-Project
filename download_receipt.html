@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PC Build Receipt</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        .section {
+            margin-bottom: 30px;
+        }
+        .component {
+            margin-bottom: 10px;
+        }
+        .label {
+            font-weight: bold;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>PC Build Receipt</h1>
+
+    <div class="section">
+        <h2>Total Wattage of PC Build</h2>
+        <p class="component"><span class="label">Total Wattage:</span> {{ total_wattage }} W</p>
+    </div>
+
+    <div class="section">
+        <h2>Total Price</h2>
+        <p class="component"><span class="label">Total Price:</span> ${{ "{:.2f}".format(total_price) }}</p>
+    </div>
+
+    <div class="section">
+        <h2>Compatibility Check</h2>
+        <p class="component">
+            {% if cpu.sockettype == motherboard.sockettype %}
+                CPU and Motherboard: Compatible
+            {% else %}
+                CPU and Motherboard: Incompatible
+            {% endif %}
+        </p>
+        <p class="component">
+            {% if ram.memory_type == motherboard.memory_type %}
+                RAM and Motherboard: Compatible
+            {% else %}
+                RAM and Motherboard: Incompatible
+            {% endif %}
+        </p>
+        <p class="component">
+            {% if power_supply.wattage >= total_wattage %}
+                Total Wattage within PSU Limit
+            {% else %}
+                Total Wattage Exceeds PSU Limit
+            {% endif %}
+        </p>
+    </div>
+</body>
+</html>

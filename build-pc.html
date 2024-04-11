@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PC Build Summary</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            margin-top: 50px;
+            font-size: 28px;
+            color: #333;
+        }
+        .component-group {
+            margin-top: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            padding: 20px;
+            text-align: left;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .back-button {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            text-decoration: none;
+            color: #007bff;
+            font-size: 16px;
+        }
+        .summary-table {
+            margin-top: 20px;
+            border-collapse: collapse;
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .summary-table th, .summary-table td {
+            border: 1px solid #ccc;
+            padding: 8px;
+        }
+        .summary-table th {
+            background-color: #f2f2f2;
+        }
+        .username {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #555;
+        }
+        .receipt-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <a href="javascript:history.back()" class="back-button">&lt; Back To PC Component Selection</a>
+    <h1>PC Build Summary</h1>
+
+    <!-- Summary Table -->
+    <div id="summary-container" style="overflow-x:auto;">
+        <table class="summary-table">
+            <tr>
+                <th>Total Wattage of PC Build</th>
+                <td>{{ total_wattage }} W</td>
+            </tr>
+            <tr>
+                <th>Total Price</th>
+                <td>${{ "{:.2f}".format(total_price) }}</td>
+            </tr>
+            <tr>
+                <th>Compatibility Check</th>
+                <td>
+                    {% if cpu.sockettype == motherboard.sockettype %}
+                        <span style="color: green;">CPU and Motherboard: Compatible</span>
+                    {% else %}
+                        <span style="color: red;">CPU and Motherboard: Incompatible</span>
+                    {% endif %}
+                    <br>
+                    {% if ram.memory_type == motherboard.memory_type %}
+                        <span style="color: green;">RAM and Motherboard: Compatible</span>
+                    {% else %}
+                        <span style="color: red;">RAM and Motherboard: Incompatible</span>
+                    {% endif %}
+                    <br>
+                    {% if power_supply.wattage >= total_wattage %}
+                        <span style="color: green;">Total Wattage within PSU Limit</span>
+                    {% else %}
+                        <span style="color: red;">Total Wattage Exceeds PSU Limit</span>
+                    {% endif %}
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- Username -->
+    <div class="username">
+        Username: <strong>{{ current_user.username if current_user.is_authenticated else "Guest" }}</strong>
+    </div>
+
+    <form action="{{ url_for('logout') }}" method="get">
+        <button type="submit">Logout</button>
+    </form>
+
+    <form action="{{ url_for('download_receipt') }}" method="post">
+        <input type="hidden" name="cpu" value="{{ cpu.id }}">
+        <input type="hidden" name="cpu_cooler" value="{{ cpu_cooler.id }}">
+        <input type="hidden" name="gpu" value="{{ gpu.id }}">
+        <input type="hidden" name="motherboard" value="{{ motherboard.id }}">
+        <input type="hidden" name="ram" value="{{ ram.id }}">
+        <input type="hidden" name="storage" value="{{ storage.id }}">
+        <input type="hidden" name="power_supply" value="{{ power_supply.id }}">
+        <input type="hidden" name="pc_case" value="{{ pc_case.id }}">
+        <button type="submit">Download Receipt/Invoice</button>
+    </form>
+
+    <!-- CPU Component -->
+    <div class="component-group">
+        <h2>CPU:</h2>
+        <p>Selected CPU: <strong>{{ cpu.brand }}</strong> - <strong>{{ cpu.model }}</strong></p>
+    </div>
+
+    <!-- CPU Cooler Component -->
+    <div class="component-group">
+        <h2>CPU Cooler:</h2>
+        <p>Selected CPU Cooler: <strong>{{ cpu_cooler.brand }}</strong> - <strong>{{ cpu_cooler.model }}</strong></p>
+    </div>
+
+    <!-- GPU Component -->
+    <div class="component-group">
+        <h2>GPU:</h2>
+        <p>Selected GPU: <strong>{{ gpu.brand }}</strong> - <strong>{{ gpu.model }}</strong></p>
+    </div>
+
+    <!-- Motherboard Component -->
+    <div class="component-group">
+        <h2>Motherboard:</h2>
+        <p>Selected Motherboard: <strong>{{ motherboard.brand }}</strong> - <strong>{{ motherboard.model }}</strong></p>
+    </div>
+
+    <!-- RAM Component -->
+    <div class="component-group">
+        <h2>RAM:</h2>
+        <p>Selected RAM: <strong>{{ ram.brand }}</strong> - <strong>{{ ram.model }}</strong></p>
+    </div>
+
+    <!-- Storage Component -->
+    <div class="component-group">
+        <h2>Storage:</h2>
+        <p>Selected Storage: <strong>{{ storage.brand }}</strong> - <strong>{{ storage.model }}</strong></p>
+    </div>
+
+    <!-- Power Supply Component -->
+    <div class="component-group">
+        <h2>Power Supply:</h2>
+        <p>Selected Power Supply: <strong>{{ power_supply.brand }}</strong> - <strong>{{ power_supply.model }}</strong></p>
+    </div>
+
+    <!-- PC Case Component -->
+    <div class="component-group">
+        <h2>PC Case:</h2>
+        <p>Selected PC Case: <strong>{{ pc_case.brand }}</strong> - <strong>{{ pc_case.model }}</strong></p>
+    </div>
+</body>
+</html>
