@@ -10,10 +10,13 @@ app.config['SECRET_KEY'] = '12345'
 db = SQLAlchemy(app)
 login_manager = LoginManager(app)
 
+invoice_count = 0
+
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(20), nullable=False, unique=True)
     password = db.Column(db.String(80), nullable=False)
+    email = db.Column(db.String(120), nullable=False, unique=True)
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -38,11 +41,12 @@ def register():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
+        email = request.form['email']
         user = User.query.filter_by(username=username).first()
         if user:
             flash('Username already exists. Please choose a different username.', 'error')
         else:
-            new_user = User(username=username, password=password)
+            new_user = User(username=username, password=password, email=email)
             db.session.add(new_user)
             db.session.commit()
             flash('Account created successfully! You can now log in.', 'success')
@@ -246,7 +250,6 @@ def build_pc():
     power_supply_id = request.form['power_supply']
     pc_case_id = request.form['pc_case']
 
-    # Query selected components by ID
     cpu = CPU.query.get(cpu_id)
     cpu_cooler = CPU_Cooler.query.get(cpu_cooler_id)
     gpu = GPU.query.get(gpu_id)
@@ -255,15 +258,15 @@ def build_pc():
     storage = Storage.query.get(storage_id)
     power_supply = Power_Supply.query.get(power_supply_id)
     pc_case = PC_Case.query.get(pc_case_id)
-     # Calculate total wattage excluding power supply
+     
     total_wattage = cpu.wattage + cpu_cooler.wattage + gpu.wattage + motherboard.wattage + ram.wattage + storage.wattage
 
-    # Calculate total price
+    
     total_price = float(cpu.price.strip('$')) + float(cpu_cooler.price.strip('$')) + float(gpu.price.strip('$')) + float(motherboard.price.strip('$')) + float(ram.price.strip('$')) + float(storage.price.strip('$')) + float(pc_case.price.strip('$')) + float(power_supply.price.strip('$'))
 
     cpu_socket = cpu.sockettype
     motherboard_socket = motherboard.sockettype
-    # Render build summary template and pass form data
+   
     return render_template('build-pc.html', cpu=cpu, cpu_cooler=cpu_cooler,
                        gpu=gpu, motherboard=motherboard, ram=ram,
                        storage=storage, power_supply=power_supply,
@@ -272,7 +275,6 @@ def build_pc():
 
 @app.route('/download_receipt', methods=['POST'])
 def download_receipt():
-    # Get selected component IDs from the form
     cpu_id = request.form['cpu']
     cpu_cooler_id = request.form['cpu_cooler']
     gpu_id = request.form['gpu']
@@ -282,7 +284,6 @@ def download_receipt():
     power_supply_id = request.form['power_supply']
     pc_case_id = request.form['pc_case']
 
-    # Query selected components by ID
     cpu = CPU.query.get(cpu_id)
     cpu_cooler = CPU_Cooler.query.get(cpu_cooler_id)
     gpu = GPU.query.get(gpu_id)
@@ -292,14 +293,11 @@ def download_receipt():
     power_supply = Power_Supply.query.get(power_supply_id)
     pc_case = PC_Case.query.get(pc_case_id)
 
-    # Calculate total wattage and total cost
     total_wattage = cpu.wattage + cpu_cooler.wattage + gpu.wattage + motherboard.wattage + ram.wattage + storage.wattage
     total_price = calculate_total_cost([cpu, cpu_cooler, gpu, motherboard, ram, storage, pc_case, power_supply])
 
-    # Generate receipt content
     receipt_content = generate_receipt_content(cpu, cpu_cooler, gpu, motherboard, ram, storage, power_supply, pc_case, total_wattage, total_price)
 
-    # Create a response with the receipt content as a text file
     response = make_response(receipt_content)
     response.headers['Content-Disposition'] = 'attachment; filename=pc_receipt.txt'
     response.headers['Content-type'] = 'text/plain'
@@ -307,14 +305,23 @@ def download_receipt():
     return response
 
 def generate_receipt_content(cpu, cpu_cooler, gpu, motherboard, ram, storage, power_supply, pc_case, total_wattage, total_price):
-    current_datetime = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    global invoice_count  
     
+    invoice_count += 1
+    
+    current_datetime = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    username = current_user.username if current_user.is_authenticated else "Guest"
+    email = current_user.email
+
     receipt_content = f"""
     ======================================
                Micro Center
-          PC Build Receipt
+             PC Build Invoice
     --------------------------------------
+    Invoice #:    {invoice_count}
     Date:         {current_datetime}
+    Username:     {username}
+    Email:        {email}
     CPU:          {cpu.brand} - {cpu.model}
     CPU Cooler:   {cpu_cooler.brand} - {cpu_cooler.model}
     GPU:          {gpu.brand} - {gpu.model}

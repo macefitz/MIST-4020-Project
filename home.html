@@ -86,10 +86,41 @@
             text-align: left;
         }
     </style>
+    <script>
+        function validateForm() {
+            var selects = document.querySelectorAll('select');
+            for (var i = 0; i < selects.length; i++) {
+                if (selects[i].value === '') {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        function updateButtonState() {
+            var buildButton = document.querySelector('input[type="submit"]');
+            buildButton.disabled = !validateForm();
+        }
+
+        window.addEventListener('DOMContentLoaded', function() {
+            updateButtonState(); 
+            var selects = document.querySelectorAll('select');
+            selects.forEach(function(select) {
+                select.addEventListener('change', updateButtonState);
+            });
+        });
+
+        document.querySelector('form').addEventListener('submit', function(event) {
+            var buildButton = document.querySelector('input[type="submit"]');
+            if (buildButton.disabled) {
+                event.preventDefault(); 
+            }
+        });
+    </script>
 </head>
 <body>
     <div class="container">
-        <h1>MICRO CENTER PC PART PICKER</h1>
+        <h1>MICRO CENTER PC COMPONENT SELECTOR SYSTEM</h1>
         <!-- Username -->
         <div class="username">
             Username: <strong>{{ current_user.username if current_user.is_authenticated else "Guest" }}</strong>
